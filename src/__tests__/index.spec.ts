@@ -3,7 +3,6 @@ import { createMockContext, MockContext } from "./context";
 
 describe("Prisma Middleware Access Control Tests", () => {
   let mockCtx: MockContext;
-
   const restrictedModels: string[] = ["user"];
 
   test("Should be able to create a user with appropriate permissions", async () => {
