@@ -6,7 +6,8 @@
   "scripts": {
     "test": "yarn prisma db push --force-reset && jest --coverage",
     "build": "tsc",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "coverage": "jest --coverage"
   },
   "repository": {
     "type": "git",
