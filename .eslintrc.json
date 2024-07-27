@@ -1,0 +1,65 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "jest/globals": true
+  },
+  "extends": [
+    "standard",
+    "plugin:security-node/recommended",
+    "eslint:recommended",
+    "plugin:jest/recommended",
+    "plugin:perfectionist/recommended-line-length"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 15,
+    "sourceType": "module"
+  },
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "rules": {
+        "perfectionist/sort-imports": [
+          "error",
+          {
+            "type": "alphabetical",
+            "order": "asc",
+            "groups": [
+              "side-effect",
+              "react",
+              "external",
+              "at",
+              "itp",
+              "internal-type",
+              "internal",
+              ["parent-type", "sibling-type", "index-type"],
+              ["parent", "sibling", "index"],
+              "side-effect",
+              "style",
+              "object",
+              "unknown"
+            ],
+            "custom-groups": {
+              "value": {
+                "at": "@**/**"
+              }
+            },
+            "newlines-between": "always"
+          }
+        ]
+      }
+    }
+  ],
+  "plugins": ["@typescript-eslint", "perfectionist", "security-node", "jest"],
+  "rules": {
+    "quotes": "off",
+    "no-var-requires": "off",
+    "semi": "off",
+    "camelcase": "off",
+    "comma-dangle": "off",
+    "jest/no-conditional-expect": "off",
+    "space-before-function-paren": "off"
+  },
+  "ignorePatterns": ["prisma/generated/**"]
+}
