@@ -1,13 +1,14 @@
 import { PrismaClient } from "@prisma/client";
 
-import { AccessRules, applyRBAC } from "../index";
+import { applyRBAC } from "../index";
+import { ResourcePermissions } from "../types";
 
 export type MockContext = {
   prisma: PrismaClient;
 };
 
 export const createMockContext = (
-  permissions: AccessRules | null,
+  permissions: ResourcePermissions | null,
   allowedActions?: string[],
   restrictedModels?: string[],
   synonyms?: Record<string, string[]>,
