@@ -113,35 +113,6 @@ app.post('/notes', async (req, res) => {
 | `synonyms`          | `Record<string, string[]>`    | Maps model synonyms to their actual model names, useful for handling schema relation mismatches.  |
 | `mismatchHandler`  | `(mismatch: string[]) => void`| Handles cases where users don't have permissions or permission models have changed, simplifying maintenance and fixing discrepancies. |
 
-## ResourcePermissions
-
-```typescript
-type AccessControlActions = "create" | "update" | "delete" | "read";
-
-/** Role-based permissions for resources */
-export interface ResourcePermissions {
-  [resource: string]: {
-    [action in AccessControlActions]?: boolean;
-  };
-}
-
-// Example
-const permissions: ResourcePermissions = {
-  user: {
-    create: true,
-    update: true,
-    delete: false,
-    read: true,
-  },
-  note: {
-    create: true,
-    update: false,
-    delete: false,
-    read: true,
-  },
-};
-```
-
 ### Performance
 Prisma-RBAC is optimized for performance, ensuring minimal overhead on your application's data access operations. Internal functions have been benchmarked to execute quickly (~0.003 ms), even under heavy load.
 
