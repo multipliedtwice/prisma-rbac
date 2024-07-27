@@ -31,7 +31,7 @@ yarn add prisma-rbac
 
 ```ts
 import { PrismaClient } from '@prisma/client';
-import { enhancePrismaWithRBAC } from 'prisma-rbac';
+import { applyRBAC } from 'prisma-rbac';
 
 // Define your role-based permissions
 const permissions = {
