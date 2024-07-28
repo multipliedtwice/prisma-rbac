@@ -1,7 +1,7 @@
 [![npm version](https://badge.fury.io/js/prisma-rbac.svg)](https://badge.fury.io/js/prisma-rbac)
 [![npm](https://img.shields.io/npm/dt/prisma-rbac.svg)](https://www.npmjs.com/package/prisma-rbac)
 [![HitCount](https://hits.dwyl.com/multipliedtwice/prisma-rbac.svg?style=flat)](http://hits.dwyl.com/multipliedtwice/prisma-rbac)
-[![Coverage](https://img.shields.io/codecov/c/github/multipliedtwice/prisma-rbac/main.svg)](https://codecov.io/gh/multipliedtwice/prisma-rbac)
+[![codecov](https://codecov.io/gh/multipliedtwice/prisma-rbac/graph/badge.svg?token=3U7V712V70)](https://codecov.io/gh/multipliedtwice/prisma-rbac)
 [![npm](https://img.shields.io/npm/l/prisma-rbac.svg)](LICENSE)
 
 # Prisma-RBAC
