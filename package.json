@@ -2,7 +2,7 @@
   "name": "prisma-rbac",
   "version": "1.0.0",
   "description": "Prisma middleware that handles Role-Based Access Control based on Express server context",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "test": "yarn prisma db push --force-reset && jest --coverage",
     "build": "tsc",
