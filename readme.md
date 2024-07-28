@@ -1,8 +1,8 @@
-[![npm version](https://badge.fury.io/js/prisma-rbac.svg)](https://badge.fury.io/js/prisma-rbac)
+[![npm](https://img.shields.io/npm/l/prisma-rbac.svg)](LICENSE)
 [![npm](https://img.shields.io/npm/dt/prisma-rbac.svg)](https://www.npmjs.com/package/prisma-rbac)
 [![HitCount](https://hits.dwyl.com/multipliedtwice/prisma-rbac.svg?style=flat)](http://hits.dwyl.com/multipliedtwice/prisma-rbac)
+![NPM Version](https://img.shields.io/npm/v/prisma-rbac)
 [![codecov](https://codecov.io/gh/multipliedtwice/prisma-rbac/graph/badge.svg?token=3U7V712V70)](https://codecov.io/gh/multipliedtwice/prisma-rbac)
-[![npm](https://img.shields.io/npm/l/prisma-rbac.svg)](LICENSE)
 
 # Prisma-RBAC
 **Prisma-RBAC is a role-based access control (RBAC) library** designed to integrate with Prisma, providing a **tool to manage user permissions**. This library enforces access control policies at a granular level for each model and action. 
