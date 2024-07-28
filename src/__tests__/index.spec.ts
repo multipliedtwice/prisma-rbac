@@ -31,7 +31,9 @@ describe("Prisma Middleware Access Control Tests", () => {
 
     const userEmail = `user-${Date.now()}@example.com`;
     const userData = { email: userEmail };
-    await expect(mockCtx.prisma.user.create({ data: userData })).rejects.toThrow("No permission");
+    await expect(mockCtx.prisma.user.create({ data: userData })).rejects.toThrow(
+      "errors.noPermission",
+    );
   });
 
   test("Should be able to read user information with read permission", async () => {
@@ -48,7 +50,7 @@ describe("Prisma Middleware Access Control Tests", () => {
 
   test("Should reject operation without permissions", async () => {
     mockCtx = createMockContext({}, [], restrictedModels);
-    await expect(mockCtx.prisma.user.findMany()).rejects.toThrow("No permission");
+    await expect(mockCtx.prisma.user.findMany()).rejects.toThrow("errors.noPermission");
   });
 
   test("Should allow operation with full permissions", async () => {
@@ -84,7 +86,7 @@ describe("Prisma Middleware Access Control Tests", () => {
     ).resolves.toBeDefined();
 
     await expect(mockCtx.prisma.user.delete({ where: { id: createdUser.id } })).rejects.toThrow(
-      "No permission",
+      "errors.noPermission",
     );
   });
 
@@ -141,7 +143,7 @@ describe("Prisma Middleware Access Control Tests", () => {
     };
 
     await expect(mockCtx.prisma.user.create({ data: newUserWithNote })).rejects.toThrow(
-      "No permission",
+      "errors.noPermission",
     );
   });
 
@@ -193,7 +195,7 @@ describe("Prisma Middleware Access Control Tests", () => {
       mockCtx.prisma.note.delete({
         where: { id: note.id },
       }),
-    ).rejects.toThrow("No permission");
+    ).rejects.toThrow("errors.noPermission");
   });
 
   test("Admin should be able to update any note's content in a nested operation", async () => {
