@@ -40,6 +40,7 @@ const operationToActionMap: Record<string, CRUDOperations> = Object.fromEntries(
 );
 
 export function applyRBAC<T>({
+  translate = (key, options) => key,
   restrictedModels = [],
   allowedActions = [],
   mismatchHandler,
@@ -67,6 +68,7 @@ export function applyRBAC<T>({
             restrictedModels,
             allowedActions,
             permissions,
+            translate,
             synonyms,
           }),
       },
@@ -79,6 +81,7 @@ function processRBAC({
   allowedActions,
   permissions,
   operation,
+  translate,
   synonyms,
   model,
   query,
@@ -92,11 +95,11 @@ function processRBAC({
   }
 
   if (!isPermissionGranted(permissions, action, model)) {
-    throw new Error("No permission");
+    throw new RBACError(action, model, translate);
   }
 
   if (!validateNestedPermissions({ permissions, synonyms, model, args })) {
-    throw new Error("No permission");
+    throw new RBACError(action, model, translate);
   }
 
   return query(args);
@@ -157,4 +160,22 @@ export function mapModelAlias(
   }
 
   return model;
+}
+
+class RBACError extends Error {
+  constructor(
+    public operation: CRUDOperations,
+    public model: string,
+    translate?: (key: string, options?: Record<string, unknown>) => string,
+  ) {
+    super();
+    this.name = "RBACError";
+    const translateFn = translate || ((key: string) => key);
+    const translatedOperation = translateFn(`operations.${operation}`);
+    const translatedModel = translateFn(`models.${model}`);
+    this.message = translateFn("errors.noPermission", {
+      operation: translatedOperation,
+      model: translatedModel,
+    });
+  }
 }

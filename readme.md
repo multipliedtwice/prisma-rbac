@@ -12,8 +12,9 @@ It also allows defining permissions on a per-user basis. This makes it suitable 
 ## Features
 - **Easy Integration**: You can add this library to your Prisma client without much hassle, making it easy to start using role-based access control in your application.
 - **Fine-Grained Control**: This feature lets you set up detailed permissions for different actions on different models. For example, you can allow some users to read data but not update it, while others can do both.
-- **Mismatch Handling**: If the permissions in your application don't match the current settings (maybe because of changes in production), this feature helps identify and fix those issues automatically, making maintenance easier.
-- **Synonym Support**: In Prisma schemas, relationships between models can have different names. For example, you might have a model note that is referred to as notes in another model's relationship. This feature manages permissions for these synonyms.
+- **Mismatch Handler**: If the permissions in your application don't match the current settings (maybe because of changes in production), this feature helps identify and fix those issues, making maintenance easier.
+- **Support for Synonyms**: In Prisma schemas, relationships between models can have different names. For example, you might have a model note that is referred to as notes in another model's relationship. This feature manages permissions for these synonyms.
+- **I18n**: Pass translation function to get human readable error messages.
 
 
 ## Installation
@@ -112,6 +113,30 @@ app.post('/notes', async (req, res) => {
 | `allowedActions` | `Array<string>`               | Lists the operations that are publicly accessible without RBAC checks.                           |
 | `synonyms`          | `Record<string, string[]>`    | Maps model synonyms to their actual model names, useful for handling schema relation mismatches.  |
 | `mismatchHandler`  | `(mismatch: string[]) => void`| Handles cases where users don't have permissions or permission models have changed, simplifying maintenance and fixing discrepancies. |
+| `translate`        | `(key: TranslationKeys, options?: Record<string, unknown>) => string` | Optional i18next function to return access errors in human language. |
+
+### i18n
+The i18n should have structure similar to this to work:
+
+```json
+{
+  "errors": {
+    "noPermission": "คุณไม่มีสิทธิ์ในการดำเนินการ {{operation}} บน {{model}}."
+  },
+  "operations": {
+    "read": "อ่าน",
+    "create": "สร้าง",
+    "update": "อัปเดต",
+    "delete": "ลบ"
+  },
+  "models": {
+    "User": "ผู้ใช้",
+    "Post": "โพสต์",
+    "Comment": "ความคิดเห็น"
+  }
+}
+```
+
 
 ### Performance
 Prisma-RBAC is optimized for performance, ensuring minimal overhead on your application's data access operations. Internal functions have been benchmarked to execute quickly (~0.003 ms), even under heavy load.

@@ -5,6 +5,7 @@ export interface ResourcePermissions {
 }
 
 export interface RBACOptions<T> {
+  translate?: (key: string, options?: Record<string, unknown>) => string;
   permissions: ResourcePermissions | undefined | null;
   restrictedModels?: (undefined | string | any)[];
   mismatchHandler?: (mismatch: string[]) => void;
@@ -36,6 +37,7 @@ export interface CheckNestedPermissionsParams {
 }
 
 export interface ExecuteRBACParams {
+  translate?: (key: string, options?: Record<string, unknown>) => string;
   permissions: ResourcePermissions | undefined | null;
   restrictedModels: (undefined | string | any)[];
   synonyms?: Record<string, string[]>;
