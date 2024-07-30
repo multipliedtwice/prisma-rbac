@@ -120,6 +120,7 @@ export function validateNestedPermissions({
   model,
   args,
 }: CheckNestedPermissionsParams): boolean {
+  if (!permissions || !args) return false;
   return !Object.entries(args).some(([key, value]) => {
     return checkPermissionForNested({ permissions, synonyms, value, model, key });
   });
