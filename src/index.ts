@@ -177,6 +177,7 @@ class RBACError extends Error {
     this.message = translateFn("errors.noPermission", {
       operation: translatedOperation,
       model: translatedModel,
+      status: 403,
     });
   }
 }
