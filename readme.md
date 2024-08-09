@@ -13,7 +13,7 @@ It also allows defining permissions on a per-user basis. This makes it suitable 
 - **Easy Integration**: You can add this library to your Prisma client without much hassle, making it easy to start using role-based access control in your application.
 - **Fine-Grained Control**: This feature lets you set up detailed permissions for different actions on different models. For example, you can allow some users to read data but not update it, while others can do both.
 - **Mismatch Handler**: If the permissions in your application don't match the current settings (maybe because of changes in production), this feature helps identify and fix those issues, making maintenance easier.
-- **Support for Synonyms**: In Prisma schemas, relationships between models can have different names. For example, you might have a model note that is referred to as notes in another model's relationship. This feature manages permissions for these synonyms.
+- **Support for Synonyms**: In Prisma schemas, relationships between models can have different names. For example, you might have a model note that is referred to as notes in another model's relationship. This feature helps to map permissions to these synonyms.
 - **I18n**: Pass translation function to get human readable error messages.
 
 
@@ -72,7 +72,7 @@ async function addRBACToRequest(req, res, next) {
     restrictedModels: ['user', 'note'],
     allowedActions: ['note:read'],
     synonyms: { note: ['notes'] },
-    mismatchHandler: (mismatch) => console.warn('Mismatched permissions:', mismatch),
+    mismatchHandler: (missing, redundant) => console.warn('Mismatched permissions:', { missing, redundant }),
   });
   next();
 }
@@ -112,7 +112,7 @@ app.post('/notes', async (req, res) => {
 | `restrictedModels`  | `Array<string>`               | Specifies the models that require RBAC checks.                                                   |
 | `allowedActions` | `Array<string>`               | Lists the operations that are publicly accessible without RBAC checks.                           |
 | `synonyms`          | `Record<string, string[]>`    | Maps model synonyms to their actual model names, useful for handling schema relation mismatches.  |
-| `mismatchHandler`  | `(mismatch: string[]) => void`| Handles cases where users don't have permissions or permission models have changed, simplifying maintenance and fixing discrepancies. |
+| `mismatchHandler`  | `(missing: string[], redundant: string[]) => void`| Handles cases where users don't have permissions or permission models have changed, simplifying maintenance and fixing discrepancies. |
 | `translate`        | `(key: TranslationKeys, options?: Record<string, unknown>) => string` | Optional i18next function to return access errors in human language. |
 
 ### i18n
