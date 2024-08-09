@@ -139,7 +139,7 @@ The i18n should have structure similar to this to work:
 
 
 ### Performance
-Prisma-RBAC is optimized for performance, ensuring minimal overhead on your application's data access operations. Internal functions have been benchmarked to execute quickly (~0.003 ms), even under heavy load.
+Prisma-RBAC is optimized for performance, ensuring minimal overhead on your application's data access operations. Internal functions have been benchmarked to execute quickly (~0.003 ms on local test), even under heavy load.
 
 ### Contributing
 If you have suggestions, bug reports, or feature requests, please open an issue or submit a pull request on our GitHub repository.
