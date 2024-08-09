@@ -164,32 +164,41 @@ export function mapModelAlias(
 }
 
 class RBACError extends Error {
-  constructor(operation, model, translate) {
-      super();
-      this.operation = operation;
-      this.model = model;
-      this.name = "RBACError";
-      this.status = 403;
-      this.type = "RBACError";
+  operation: string;
+  status: number;
+  model: string;
+  type: string;
 
-      const translateFn = translate || ((key) => key);
-      const translatedOperation = translateFn(`operations.${operation}`);
-      const translatedModel = translateFn(`models.${model}`);
-      this.message = translateFn("errors.noPermission", {
-          operation: translatedOperation,
-          model: translatedModel,
-          status: this.status,
-      });
+  constructor(
+    operation: string,
+    model: string,
+    translate?: (key: string, options?: Record<string, unknown>) => string,
+  ) {
+    super();
+    this.operation = operation;
+    this.model = model;
+    this.status = 403;
+    this.type = "RBACError";
+    this.name = "RBACError";
+
+    const translateFn = translate || ((key: string) => key);
+    const translatedOperation = translateFn(`operations.${operation}`);
+    const translatedModel = translateFn(`models.${model}`);
+    this.message = translateFn("errors.noPermission", {
+      operation: translatedOperation,
+      model: translatedModel,
+      status: this.status,
+    });
   }
 
   toJSON() {
-      return {
-          error: this.name,
-          message: this.message,
-          operation: this.operation,
-          model: this.model,
-          status: this.status,
-          type: this.type,
-      };
+    return {
+      operation: this.operation,
+      message: this.message,
+      status: this.status,
+      model: this.model,
+      error: this.name,
+      type: this.type,
+    };
   }
 }
