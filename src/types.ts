@@ -1,3 +1,5 @@
+import { RBACError } from ".";
+
 export type CRUDOperations = "create" | "update" | "delete" | "read";
 
 export interface ResourcePermissions {
@@ -47,3 +49,5 @@ export interface ExecuteRBACParams {
   query: any;
   args: any;
 }
+
+export type RBACErrorType = InstanceType<typeof RBACError>;
