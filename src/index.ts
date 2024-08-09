@@ -164,20 +164,32 @@ export function mapModelAlias(
 }
 
 class RBACError extends Error {
-  constructor(
-    public operation: CRUDOperations,
-    public model: string,
-    translate?: (key: string, options?: Record<string, unknown>) => string,
-  ) {
-    super();
-    this.name = "RBACError";
-    const translateFn = translate || ((key: string) => key);
-    const translatedOperation = translateFn(`operations.${operation}`);
-    const translatedModel = translateFn(`models.${model}`);
-    this.message = translateFn("errors.noPermission", {
-      operation: translatedOperation,
-      model: translatedModel,
-      status: 403,
-    });
+  constructor(operation, model, translate) {
+      super();
+      this.operation = operation;
+      this.model = model;
+      this.name = "RBACError";
+      this.status = 403;
+      this.type = "RBACError";
+
+      const translateFn = translate || ((key) => key);
+      const translatedOperation = translateFn(`operations.${operation}`);
+      const translatedModel = translateFn(`models.${model}`);
+      this.message = translateFn("errors.noPermission", {
+          operation: translatedOperation,
+          model: translatedModel,
+          status: this.status,
+      });
+  }
+
+  toJSON() {
+      return {
+          error: this.name,
+          message: this.message,
+          operation: this.operation,
+          model: this.model,
+          status: this.status,
+          type: this.type,
+      };
   }
 }
