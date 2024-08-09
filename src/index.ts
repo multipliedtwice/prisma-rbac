@@ -163,6 +163,7 @@ export function mapModelAlias(
   return model;
 }
 
+// error
 class RBACError extends Error {
   operation: string;
   status: number;
