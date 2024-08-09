@@ -49,14 +49,20 @@ export function applyRBAC<T>({
   permissions,
 }: RBACOptions<T>) {
   const verifyPermissions = () => {
-    const mismatch = Array.isArray(restrictedModels)
-      ? restrictedModels.filter((model) => !permissions || !permissions[model])
+    if (!Array.isArray(restrictedModels)) {
+      return;
+    }
+
+    const missingModels = restrictedModels.filter((model) => !permissions || !permissions[model]);
+
+    const redundantModels = permissions
+      ? Object.keys(permissions).filter((model) => !restrictedModels.includes(model))
       : [];
-    if (mismatch.length > 0 && typeof mismatchHandler === "function") {
-      mismatchHandler(mismatch);
+
+    if (typeof mismatchHandler === "function" && missingModels.length > 0) {
+      mismatchHandler(missingModels, redundantModels);
     }
   };
-
   verifyPermissions();
 
   return prismaClient.$extends({

@@ -8,9 +8,9 @@ export interface ResourcePermissions {
 
 export interface RBACOptions<T> {
   translate?: (key: string, options?: Record<string, unknown>) => string;
+  mismatchHandler?: (missing: string[], redundant: string[]) => void;
   permissions: ResourcePermissions | undefined | null;
   restrictedModels?: (undefined | string | any)[];
-  mismatchHandler?: (mismatch: string[]) => void;
   synonyms?: Record<string, string[]>;
   allowedActions?: string[];
   prismaClient: any | T;

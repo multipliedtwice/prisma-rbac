@@ -288,17 +288,21 @@ describe("RBAC Helper Functions", () => {
   test("Should handle permission mismatch", () => {
     const mismatchHandler = jest.fn();
 
+    // Assuming `createMockContext` now follows the updated `applyRBAC` logic
     createMockContext({ user: { create: true } }, [], ["note"], {}, mismatchHandler);
 
-    expect(mismatchHandler).toHaveBeenCalledWith(["note"]);
+    // Expect mismatchHandler to be called with missingModels and redundantModels
+    expect(mismatchHandler).toHaveBeenCalledWith(["note"], ["user"]);
   });
 
   test("Should handle permission mismatch with null permissions", () => {
     const mismatchHandler = jest.fn();
 
+    // Assuming `createMockContext` now follows the updated `applyRBAC` logic
     createMockContext(null, [], ["note"], {}, mismatchHandler);
 
-    expect(mismatchHandler).toHaveBeenCalledWith(["note"]);
+    // Expect mismatchHandler to be called with missingModels and no redundantModels
+    expect(mismatchHandler).toHaveBeenCalledWith(["note"], []);
   });
 
   test("Should use default parameters", () => {
