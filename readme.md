@@ -150,3 +150,7 @@ Prisma-RBAC is licensed under the MIT License. See the LICENSE file for more inf
 ### Keywords
 Prisma, RBAC, role-based access control, permissions, access control, security, Node.js, TypeScript
 
+#### Credits:
+- Super Kick Gym - [Brazilian Jiu Jitsu in Bangkok](https://en.bjj-bangkok.com)
+
+- Rememo - [Free Task Management and Corporate Chat](https://rememo.io)
