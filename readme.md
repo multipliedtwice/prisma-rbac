@@ -34,7 +34,7 @@ yarn add prisma-rbac
 import { PrismaClient } from '@prisma/client';
 import { applyRBAC } from 'prisma-rbac';
 
-// Define your role-based permissions
+// Define your role-based permissions (save in DB per user/group)
 const permissions = {
   user: {
     create: true,
