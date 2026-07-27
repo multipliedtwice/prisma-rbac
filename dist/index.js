@@ -1,101 +1,137 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isActionAllowed = isActionAllowed;
+exports.RBACError = void 0;
+exports.isPermissionGranted = isPermissionGranted;
 exports.applyRBAC = applyRBAC;
-exports.rbacQuery = rbacQuery;
+exports.isActionAllowed = isActionAllowed;
 exports.validateNestedPermissions = validateNestedPermissions;
-exports.resolveModelAlias = resolveModelAlias;
-function isActionAllowed(permissions, action, model) {
-    if (!permissions || !model)
+exports.mapModelAlias = mapModelAlias;
+function isPermissionGranted(permissions, action, resource) {
+    if (!permissions || !resource)
         return false;
-    return !!permissions[model]?.[action];
+    return !!permissions[resource]?.[action];
 }
-const operationsMap = {
-    createManyAndReturn: "create",
-    findUniqueOrThrow: "read",
-    findFirstOrThrow: "read",
-    createMany: "create",
-    updateMany: "update",
-    deleteMany: "delete",
-    findUnique: "read",
-    findFirst: "read",
-    aggregate: "read",
-    findMany: "read",
-    create: "create",
-    update: "update",
-    upsert: "update",
-    delete: "delete",
-    groupBy: "read",
-    count: "read",
+const operationMappings = {
+    read: [
+        "findUniqueOrThrow",
+        "findFirstOrThrow",
+        "findUnique",
+        "findFirst",
+        "aggregate",
+        "findMany",
+        "groupBy",
+        "count",
+    ],
+    create: ["createManyAndReturn", "createMany", "create"],
+    update: ["updateMany", "update", "upsert"],
+    delete: ["deleteMany", "delete"],
 };
-function applyRBAC({ allowedOperations = [], restrictedModels = [], debug, prismaClient, synonyms = {}, permissions, mismatchHandler, }) {
-    const checkPermissionMismatch = () => {
-        const mismatch = Array.isArray(restrictedModels)
-            ? restrictedModels.filter((model) => !permissions || !permissions[model])
+const operationToActionMap = Object.fromEntries(Object.entries(operationMappings).flatMap(([action, operations]) => operations.map((operation) => [operation, action])));
+function applyRBAC({ translate = (key, options) => key, restrictedModels = [], allowedActions = [], mismatchHandler, synonyms = {}, prismaClient, permissions, }) {
+    const verifyPermissions = () => {
+        if (!Array.isArray(restrictedModels)) {
+            return;
+        }
+        const missingModels = restrictedModels.filter((model) => !permissions || !permissions[model]);
+        const redundantModels = permissions
+            ? Object.keys(permissions).filter((model) => !restrictedModels.includes(model))
             : [];
-        if (mismatch.length > 0 && typeof mismatchHandler === "function") {
-            mismatchHandler(mismatch);
+        if (typeof mismatchHandler === "function" && missingModels.length > 0) {
+            mismatchHandler(missingModels, redundantModels);
         }
     };
-    checkPermissionMismatch();
+    verifyPermissions();
     return prismaClient.$extends({
         query: {
             $allModels: {
-                $allOperations: (params) => rbacQuery({
+                $allOperations: (params) => processRBAC({
                     ...params,
-                    allowedOperations,
                     restrictedModels,
-                    debug,
+                    allowedActions,
                     permissions,
+                    translate,
                     synonyms,
                 }),
             },
         },
     });
 }
-function rbacQuery({ operation, model, query, args, allowedOperations, restrictedModels, debug, permissions, synonyms, }) {
-    if (debug)
-        console.log("RBAC Check", { operation, model, args });
-    const action = operationsMap[operation];
-    const operationKey = `${model}:${action}`;
-    if (!restrictedModels.includes(model) || allowedOperations.includes(operationKey)) {
+function processRBAC({ restrictedModels, allowedActions, permissions, operation, translate, synonyms, model, query, args, }) {
+    const action = operationToActionMap[operation];
+    const actionKey = `${model}:${action}`;
+    if (isActionAllowed({ restrictedModels, allowedActions, actionKey, model })) {
         return query(args);
     }
-    if (!isActionAllowed(permissions, action, model)) {
-        throw new Error("No permission");
+    if (!isPermissionGranted(permissions, action, model)) {
+        throw new RBACError(action, model, translate);
     }
-    if (!validateNestedPermissions({ permissions, synonyms, model, debug, args })) {
-        throw new Error("No permission");
+    if (!validateNestedPermissions({ permissions, synonyms, model, args })) {
+        throw new RBACError(action, model, translate);
     }
     return query(args);
 }
-function validateNestedPermissions({ permissions, synonyms, model, debug, args, }) {
+function isActionAllowed({ restrictedModels, allowedActions, actionKey, model, }) {
+    return !restrictedModels?.includes(model) || allowedActions.includes(actionKey);
+}
+function validateNestedPermissions({ permissions, synonyms, model, args, }) {
+    if (!args)
+        return true;
     return !Object.entries(args).some(([key, value]) => {
-        if (typeof value === "object") {
-            const operationType = operationsMap[key];
-            if (operationType) {
-                return !isActionAllowed(permissions, operationType, resolveModelAlias(model, synonyms));
-            }
-            else {
-                return !validateNestedPermissions({
-                    permissions,
-                    synonyms,
-                    model: key.toLowerCase(),
-                    debug,
-                    args: value,
-                });
-            }
-        }
-        return false;
+        return checkPermissionForNested({ permissions, synonyms, value, model, key });
     });
 }
-function resolveModelAlias(model, synonyms) {
+function checkPermissionForNested({ permissions, synonyms, value, model, key, }) {
+    if (typeof value === "object") {
+        const operationType = key in operationToActionMap ? operationToActionMap[key] : undefined;
+        if (operationType) {
+            return !isPermissionGranted(permissions, operationType, mapModelAlias(model, synonyms));
+        }
+        return !validateNestedPermissions({
+            model: key.toLowerCase(),
+            permissions,
+            args: value,
+            synonyms,
+        });
+    }
+    return false;
+}
+function mapModelAlias(model, synonyms) {
     if (!synonyms || !model)
         return model;
-    for (const [synonym, models] of Object.entries(synonyms)) {
+    for (const [alias, models] of Object.entries(synonyms)) {
         if (models.includes(model)) {
-            return synonym;
+            return alias;
         }
     }
     return model;
 }
+// error
+class RBACError extends Error {
+    constructor(operation, model, translate) {
+        super();
+        this.operation = operation;
+        this.model = model;
+        this.status = 403;
+        this.type = "RBACError";
+        this.name = "RBACError";
+        const translateFn = translate || ((key) => key);
+        const translatedOperation = translateFn(`operations.${operation}`);
+        const translatedModel = translateFn(`models.${model}`);
+        this.message = translateFn("errors.noPermission", {
+            operation: translatedOperation,
+            model: translatedModel,
+            status: this.status,
+        });
+    }
+    toJSON() {
+        return {
+            operation: this.operation,
+            message: this.message,
+            status: this.status,
+            model: this.model,
+            error: this.name,
+            type: this.type,
+        };
+    }
+}
+exports.RBACError = RBACError;
