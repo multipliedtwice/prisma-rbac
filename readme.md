@@ -67,7 +67,7 @@ const prisma = new PrismaClient();
 async function addRBACToRequest(req, res, next) {
   const user = await getUserWithPermissions(req.userId);
   req.prisma = applyRBAC({
-    prisma,
+    prismaClient: prisma,
     permissions: user.permissions,
     restrictedModels: ['user', 'note'],
     allowedActions: ['note:read'],
@@ -108,6 +108,7 @@ app.post('/notes', async (req, res) => {
 ### Configuration Options
 | Option             | Type                          | Description                                                                                      |
 |--------------------|-------------------------------|--------------------------------------------------------------------------------------------------|
+| `prismaClient`     | `PrismaClient`                | Prisma Client instance to extend.                                                                |
 | `permissions`      | `ResourcePermissions \| null \| undefined` | Defines the role-based permissions for models and actions.                                       |
 | `restrictedModels`  | `Array<string>`               | Specifies the models that require RBAC checks.                                                   |
 | `allowedActions` | `Array<string>`               | Lists the operations that are publicly accessible without RBAC checks.                           |
