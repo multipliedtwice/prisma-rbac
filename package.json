@@ -78,5 +78,9 @@
   "homepage": "https://github.com/multipliedtwice/prisma-rbac#readme",
   "dependencies": {
     "@prisma/client": "5.18.0"
+  },
+  "packageManager": "yarn@1.22.22",
+  "resolutions": {
+    "**/@typescript-eslint/typescript-estree/minimatch": "^9.0.9"
   }
 }
